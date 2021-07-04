@@ -70,18 +70,15 @@
       <el-col :span="5">
         <span>Net</span>
       </el-col>
-      <el-col :span="7">
+      <el-col :span="9">
         <span class="el-icon-download">{{
           formatBytes(nodeStatus?.net.rx ?? 0) + "/s"
         }}</span>
       </el-col>
-      <el-col :span="7">
+      <el-col :span="9">
         <span class="el-icon-upload2">{{
           formatBytes(nodeStatus?.net.tx ?? 0) + "/s"
         }}</span>
-      </el-col>
-      <el-col :span="5">
-        <span>{{ formatBytes(nodeStatus?.net.count ?? 0) }}</span>
       </el-col>
     </el-row>
   </el-card>
@@ -106,7 +103,6 @@ export interface NodeStatus {
   }
   uptime: number
   net: {
-    count: number
     rx: number
     tx: number
   }
@@ -132,7 +128,11 @@ export default defineComponent({
   },
   methods: {
     formatBytes(size: number) {
-      if (size < (1024 * 1024 * 1024)) {
+      if (size < (1024 * 1024)) {
+        let temp = size / 1024
+        return temp.toFixed(2) + 'KB'
+      }
+      else if (size < (1024 * 1024 * 1024)) {
         let temp = size / (1024 * 1024)
         return temp.toFixed(2) + 'MB'
       } else {
