@@ -7,80 +7,68 @@
         <span v-else class="offline-text">离线</span>
       </div>
     </template>
-    <el-row type="flex" class="status-item">
-      <el-col :span="5">
-        <span>CPU</span>
-      </el-col>
-      <el-col :span="10">
-        <el-progress
-          :text-inside="true"
-          :percentage="nodeStatus?.cpu"
-          :stroke-width="20"
-        ></el-progress>
-      </el-col>
-    </el-row>
-    <el-row type="flex" class="status-item">
-      <el-col :span="5">
-        <span>RAM</span>
-      </el-col>
-      <el-col :span="10">
-        <el-progress
-          :text-inside="true"
-          :percentage="nodeStatus?.mem.percent"
-          :stroke-width="20"
+    <StatusItem class="status-item">
+      <template #name><span>CPU</span></template>
+      <el-progress
+        :text-inside="true"
+        :percentage="nodeStatus?.cpu"
+        :stroke-width="20"
+      ></el-progress>
+    </StatusItem>
+
+    <StatusItem class="status-item">
+      <template #name><span>RAM</span></template>
+      <el-progress
+        :text-inside="true"
+        :percentage="nodeStatus?.mem.percent"
+        :stroke-width="20"
+      >
+      </el-progress>
+    </StatusItem>
+    <StatusItem class="status-item">
+      <span>{{
+        formatBytes(nodeStatus?.mem.used_mem ?? 0) +
+        "/" +
+        formatBytes(nodeStatus?.mem.total_mem ?? 0)
+      }}</span>
+    </StatusItem>
+
+    <StatusItem class="status-item">
+      <template #name><span>SWAP</span></template>
+      <el-progress
+        :text-inside="true"
+        :percentage="nodeStatus?.swap.percent"
+        :stroke-width="20"
+      ></el-progress>
+    </StatusItem>
+    <StatusItem class="status-item">
+      <span>{{
+        formatBytes(nodeStatus?.swap.used_mem ?? 0) +
+        "/" +
+        formatBytes(nodeStatus?.swap.total_mem ?? 0)
+      }}</span>
+    </StatusItem>
+
+    <StatusItem class="status-item">
+      <template #name><span>Uptime</span></template>
+      <span>{{ formatUptime(nodeStatus?.uptime ?? 0) }}</span>
+    </StatusItem>
+
+    <StatusItem class="status-item">
+      <template #name> <span>Net</span></template>
+      <el-row>
+        <el-col :span="12">
+          <span class="el-icon-download">{{
+            formatBytes(nodeStatus?.net.rx ?? 0) + "/s"
+          }}</span></el-col
         >
-        </el-progress>
-      </el-col>
-      <el-col :span="9"
-        >&nbsp;&nbsp;{{
-          formatBytes(nodeStatus?.mem.used_mem ?? 0) +
-          "/" +
-          formatBytes(nodeStatus?.mem.total_mem ?? 0)
-        }}
-      </el-col>
-    </el-row>
-    <el-row type="flex" class="status-item">
-      <el-col :span="5">
-        <span>SWAP</span>
-      </el-col>
-      <el-col :span="10">
-        <el-progress
-          :text-inside="true"
-          :percentage="nodeStatus?.swap.percent"
-          :stroke-width="20"
-        ></el-progress>
-      </el-col>
-      <el-col :span="9"
-        >&nbsp;&nbsp;{{
-          formatBytes(nodeStatus?.swap.used_mem ?? 0) +
-          "/" +
-          formatBytes(nodeStatus?.swap.total_mem ?? 0)
-        }}
-      </el-col>
-    </el-row>
-    <el-row type="flex" class="status-item">
-      <el-col :span="5">
-        <span>Uptime</span>
-      </el-col>
-      <el-col :span="16">
-        <span>{{ formatUptime(nodeStatus?.uptime ?? 0) }}</span>
-      </el-col>
-    </el-row>
-    <el-row type="flex" class="status-item">
-      <el-col :span="5">
-        <span>Net</span>
-      </el-col>
-      <el-col :span="9">
-        <span class="el-icon-download">{{
-          formatBytes(nodeStatus?.net.rx ?? 0) + "/s"
-        }}</span>
-      </el-col>
-      <el-col :span="9">
-        <span class="el-icon-upload2">{{
-          formatBytes(nodeStatus?.net.tx ?? 0) + "/s"
-        }}</span>
-      </el-col>
-    </el-row>
+        <el-col :span="12"
+          ><span class="el-icon-upload2">{{
+            formatBytes(nodeStatus?.net.tx ?? 0) + "/s"
+          }}</span>
+        </el-col>
+      </el-row>
+    </StatusItem>
   </el-card>
 </template>
 
@@ -88,6 +76,7 @@
 import { Duration } from 'luxon'
 import { defineComponent, PropType } from 'vue'
 import { ElCard, ElRow, ElCol, ElProgress } from "element-plus"
+import StatusItem from "./StatusItem.vue"
 
 export interface NodeStatus {
   cpu: number
@@ -124,7 +113,7 @@ export default defineComponent({
   },
 
   components: {
-    ElCard, ElRow, ElCol, ElProgress
+    ElCard, ElRow, ElCol, ElProgress, StatusItem
   },
   methods: {
     formatBytes(size: number) {
